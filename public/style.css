@@ -17,3 +17,6 @@ div.note {
     padding: 10px;
     border: solid 1px black;
 }
+svg{
+    z-index: 1;
+}
