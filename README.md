@@ -4,7 +4,7 @@ Thread Board is a fully client-side app to solve your own work like a detective.
 
 ## Access
 
-Access it [here](https://threadboard-town.web.app). No login required.
+Access it [here](https://threadboard-town.web.app). No login required. Or hell, you can download it, and host it yourself to add features you want, but isn't there.
 
 ## Features
 
@@ -13,6 +13,10 @@ Access it [here](https://threadboard-town.web.app). No login required.
 - Unlimited canvas
 - Import your boards, or export to share with friends or co-workers (WIP)
 - Styling your notes and strings (WIP)
+
+## Contributions and Pull-requests
+
+Pull requests are welcome, and will be reviewed.
 
 ## AI usage
 
