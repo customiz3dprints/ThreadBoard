@@ -66,6 +66,7 @@ window.onload = function () {
     stringObj.style.pointerEvents = "none";
     document.body.appendChild(stringObj);
     for(var i = 0; i < (board.strings).length; i++){
+        if(!board.notes[board.strings[i].between[0]] || !board.notes[board.strings[i].between[1]]) {return;}
         const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
         string.id = String(board.strings[i].id + "s")
         string.setAttribute("x1",board.notes[board.strings[i].between[0]].position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
@@ -98,18 +99,21 @@ document.addEventListener("mousedown", function(klikk){
         downX = klikk.clientX;
         downY = klikk.clientY;
         board = JSON.parse(localStorage.getItem("board"));
-        board.notes[board.notes.length] = {id: board.notes[board.notes.length-1].id+1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": klikk.clientX, "y" : klikk.clientY} };
+        let newID;
+        if (!board.notes[board.notes.length-1]){newID = 0;}
+        else (newID = board.notes[board.notes.length-1].id+1)
+        board.notes[board.notes.length] = {id: newID,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": klikk.clientX, "y" : klikk.clientY} };
         localStorage.setItem("board", JSON.stringify(board));
         const note = document.createElement("div");
         note.classList.add("note");
         note.id = board.notes[board.notes.length-1].id;
         const dragging = document.createElement("div");
         dragging.classList.add("noteTop");
-        dragging.id = board.notes[board.notes.length-1].id+1;
+        dragging.id = newID;
         const title = document.createElement("h1");
         title.innerText = board.notes[board.notes.length-1].title;
         title.classList.add("noteTop");
-        title.id = board.notes[board.notes.length-1]+1;
+        title.id = newID;
         title.contentEditable = true;
         note.appendChild(title);
         const content = document.createElement("p");
@@ -169,6 +173,7 @@ document.addEventListener("mousemove", function(mozg){
             downY = mozg.clientY;
         })
         board.strings.forEach(stringIndex => {
+            if(!board.notes[board.strings[stringIndex.id].between[0]] || !board.notes[board.strings[stringIndex.id].between[1]]) {return;}
             const string = document.getElementById(String(stringIndex.id + "s"));
             string.setAttribute("x1",board.notes[board.strings[stringIndex.id].between[0]].position.x+(document.getElementById(board.strings[stringIndex.id].between[0]).clientWidth/2));
             string.setAttribute("y1",board.notes[board.strings[stringIndex.id].between[0]].position.y);
