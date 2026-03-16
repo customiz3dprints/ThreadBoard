@@ -1,10 +1,11 @@
 body{
     overflow: hidden;
+    margin: 0 0 0 0;
 }
 div.note {
     position: absolute;
-    width: 300px;
-    height: 200px;
+    max-width: 500px;
+    max-height: 200px;
     border-style: solid;
     border-color: black;
     border-width: 3px;
@@ -17,6 +18,25 @@ div.note {
     padding: 10px;
     border: solid 1px black;
 }
-svg{
-    z-index: 1;
+.noteTop{
+    background-color: rgb(161, 138, 108);
+    width: inherit;
+    height: 10px;
+    border-radius: 10pt;
+}
+.delButton svg{
+    width: 24px;
+    height: 24px;
+}
+.delButton{
+    padding: 0 0 0 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    text-align: right;
+}
+.delButton:hover{
+    background-color: rgba(107, 107, 107, 0.267);
 }
