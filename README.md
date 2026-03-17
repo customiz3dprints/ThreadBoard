@@ -9,7 +9,11 @@ Access it [here](https://threadboard-town.web.app). No login required. Or hell, 
 ## Features
 
 - Make notes wherever your heart desires.
-- Connect them with strings to link ideas and with solutions, or even sub-ideas by clicking the red circle buttons between two notes
+- Connect them with strings to link ideas and with solutions, or even sub-ideas by clicking the red circle buttons between two notes 
+Because one shipright couldn't figure it out:
+Click a circle with LMB (left click)
+Then click another one, same button
+CLICK, not DRAG
 - Unlimited canvas
 - Import your boards, or export to share with friends or co-workers (WIP)
 - Styling your notes and strings (WIP)
