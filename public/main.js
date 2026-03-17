@@ -2,12 +2,83 @@ let downMB, downLB;
 let downY;
 let downX;
 let selectedNote;
+let newStringNote;
+const stringObj = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 function deleteNote(id){
     document.getElementById(id).remove();
     board = JSON.parse(localStorage.getItem("board"));
+    board.strings = board.strings.filter((Delstring,i) => {
+        const shouldDel = Delstring.between[0] == id || Delstring.between[1] == id;
+        if (shouldDel){document.getElementById(String(i + "s"))?.remove();}
+        return !shouldDel;
+    })
     board.notes = board.notes.filter(note => note.id !== id);
     localStorage.setItem("board", JSON.stringify(board));
+    window.location.reload();
 }
+function newString(id){
+    if (newStringNote == null) {
+        
+        newStringNote = id;
+    }
+    else{
+        let newStringID;
+        board = JSON.parse(localStorage.getItem("board"));
+        if (!board.strings.length){newStringID = 0;}
+        else (newStringID = board.notes[board.strings.length-1].id+1)
+        board.strings[board.strings.length] = {"between" : [newStringNote, id]};
+        const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        string.id = String(newStringID + "s");
+        const note1 = board.notes.find(n => n.id==newStringNote);
+        const note2 = board.notes.find(n => n.id==id);
+        string.setAttribute("x1",note1.position.x+(document.getElementById(newStringNote).clientWidth/2));
+        string.setAttribute("y1",note1.position.y+20);
+        string.setAttribute("x2",note2.position.x+(document.getElementById(id).clientWidth/2));
+        string.setAttribute("y2",note2.position.y+20);
+        string.setAttribute("style", `stroke:red;stroke-width:8;`);
+        string.classList.add("strings");
+        stringObj.appendChild(string);
+        newStringNote = null;
+        localStorage.setItem("board", JSON.stringify(board));
+    }
+}
+function createNote(id, NewTitle, NewContent, positionX, positionY){
+    const note = document.createElement("div");
+    note.classList.add("note");
+    note.id = id;
+    const dragging = document.createElement("div");
+    dragging.classList.add("noteTop");
+    dragging.id = id;
+    const stringHole = document.createElement("button");
+    stringHole.classList.add("pins");
+    stringHole.id = id;
+    stringHole.setAttribute("onclick",`newString(${id})`);
+    dragging.append(stringHole);
+    note.appendChild(dragging);
+    const title = document.createElement("h1");
+    title.innerText = NewTitle;
+    title.contentEditable = true;
+    note.appendChild(title);
+    const content = document.createElement("p");
+    content.innerHTML = NewContent;
+    content.contentEditable = true;
+    note.appendChild(content);
+    const delButton = document.createElement("button");
+    delButton.classList.add("delButton");
+    const delSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    delSVG.setAttribute("width", 22);
+    delSVG.setAttribute("height", 24);
+    delSVG.style.pointerEvents = "none";
+    const delCan = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    delCan.setAttribute("d", "m15.707,11.707l-2.293,2.293,2.293,2.293c.391.391.391,1.023,0,1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-2.293-2.293-2.293,2.293c-.195.195-.451.293-.707.293s-.512-.098-.707-.293c-.391-.391-.391-1.023,0-1.414l2.293-2.293-2.293-2.293c-.391-.391-.391-1.023,0-1.414s1.023-.391,1.414,0l2.293,2.293,2.293-2.293c.391-.391,1.023-.391,1.414,0s.391,1.023,0,1.414Zm7.293-6.707c0,.553-.448,1-1,1h-.885l-1.276,13.472c-.245,2.581-2.385,4.528-4.978,4.528h-5.727c-2.589,0-4.729-1.943-4.977-4.521l-1.296-13.479h-.86c-.552,0-1-.447-1-1s.448-1,1-1h4.101c.465-2.279,2.485-4,4.899-4h2c2.414,0,4.435,1.721,4.899,4h4.101c.552,0,1,.447,1,1Zm-14.828-1h7.656c-.413-1.164-1.524-2-2.828-2h-2c-1.304,0-2.415.836-2.828,2Zm10.934,2H4.87l1.278,13.287c.148,1.547,1.432,2.713,2.986,2.713h5.727c1.556,0,2.84-1.168,2.987-2.718l1.258-13.282Z");
+    delSVG.appendChild(delCan);
+    delButton.appendChild(delSVG);
+    delButton.setAttribute("onclick",`deleteNote(${id})`);
+    note.appendChild(delButton);
+    note.style.transform = `translate(${positionX}px, ${positionY}px)`;
+    document.body.appendChild(note);
+}
+
 window.onload = function () {
     console.log(JSON.parse(localStorage.getItem("board")));
     if (localStorage.length == 0){
@@ -15,65 +86,47 @@ window.onload = function () {
             {"notes":[
                     {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500} },
                     {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800} },
-                    {id: 2, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 0, "y" : 0} },
-                    {id: 3,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 100, "y" : 100} },
-             ],/*
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0} },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100} },
+             ],
+             
             "strings": [
-                {id : 0, "between" : [0,1]},
-                {id : 1, "between" : [2,3]},
-            ]*/}
+            ]
+                }
                 
         ))
     }
     
     board = JSON.parse(localStorage.getItem("board"));
     for(var i = 0; i < (board.notes).length; i++){
-        const note = document.createElement("div");
-        note.classList.add("note");
-        note.id = board.notes[i].id;
-        const dragging = document.createElement("div");
-        dragging.classList.add("noteTop");
-        dragging.id = board.notes[i].id;
-        note.appendChild(dragging);
-        const title = document.createElement("h1");
-        title.innerText = board.notes[i].title;
-        title.contentEditable = true;
-        note.appendChild(title);
-        const content = document.createElement("p");
-        content.innerHTML = board.notes[i].content;
-        content.contentEditable = true;
-        note.appendChild(content);
-        const delButton = document.createElement("button");
-        delButton.classList.add("delButton");
-        const delSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        delSVG.setAttribute("width", 22);
-        delSVG.setAttribute("height", 24);
-        delSVG.style.pointerEvents = "none";
-        const delCan = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        delCan.setAttribute("d", "m15.707,11.707l-2.293,2.293,2.293,2.293c.391.391.391,1.023,0,1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-2.293-2.293-2.293,2.293c-.195.195-.451.293-.707.293s-.512-.098-.707-.293c-.391-.391-.391-1.023,0-1.414l2.293-2.293-2.293-2.293c-.391-.391-.391-1.023,0-1.414s1.023-.391,1.414,0l2.293,2.293,2.293-2.293c.391-.391,1.023-.391,1.414,0s.391,1.023,0,1.414Zm7.293-6.707c0,.553-.448,1-1,1h-.885l-1.276,13.472c-.245,2.581-2.385,4.528-4.978,4.528h-5.727c-2.589,0-4.729-1.943-4.977-4.521l-1.296-13.479h-.86c-.552,0-1-.447-1-1s.448-1,1-1h4.101c.465-2.279,2.485-4,4.899-4h2c2.414,0,4.435,1.721,4.899,4h4.101c.552,0,1,.447,1,1Zm-14.828-1h7.656c-.413-1.164-1.524-2-2.828-2h-2c-1.304,0-2.415.836-2.828,2Zm10.934,2H4.87l1.278,13.287c.148,1.547,1.432,2.713,2.986,2.713h5.727c1.556,0,2.84-1.168,2.987-2.718l1.258-13.282Z");
-        delSVG.appendChild(delCan);
-        delButton.appendChild(delSVG);
-        delButton.setAttribute("onclick",`deleteNote(${board.notes[i].id})`);
-        note.appendChild(delButton);
-        note.style.transform = `translate(${board.notes[i].position.x}px, ${board.notes[i].position.y}px)`;
-        document.body.appendChild(note);
+        createNote(
+            board.notes[i].id,
+            board.notes[i].title,
+            board.notes[i].content,
+            board.notes[i].position.x,
+            board.notes[i].position.y
+        );
     }
-    const stringObj = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    
     stringObj.setAttribute("width", window.innerWidth);
     stringObj.setAttribute("height", window.innerHeight);
     stringObj.classList.add("strings");
     stringObj.style.position = "absolute";
     stringObj.style.pointerEvents = "none";
     document.body.appendChild(stringObj);
+    
+    if(!board.strings){return;}
     for(var i = 0; i < (board.strings).length; i++){
-        if(!board.notes[board.strings[i].between[0]] || !board.notes[board.strings[i].between[1]]) {return;}
+        const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
+        const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
+        if(!note1 || !note2) {continue;}
         const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        string.id = String(board.strings[i].id + "s")
-        string.setAttribute("x1",board.notes[board.strings[i].between[0]].position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
-        string.setAttribute("y1",board.notes[board.strings[i].between[0]].position.y);
-        string.setAttribute("x2",board.notes[board.strings[i].between[1]].position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
-        string.setAttribute("y2",board.notes[board.strings[i].between[1]].position.y);
-        string.setAttribute("style", `stroke:red;stroke-width:12;`);
+        string.id = String(i + "s");
+        string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
+        string.setAttribute("y1",note1.position.y+20);
+        string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
+        string.setAttribute("y2",note2.position.y+20);
+        string.setAttribute("style", `stroke:red;stroke-width:8;`);
         string.classList.add("strings");
         stringObj.appendChild(string);
     }
@@ -99,46 +152,19 @@ document.addEventListener("mousedown", function(klikk){
         downX = klikk.clientX;
         downY = klikk.clientY;
         board = JSON.parse(localStorage.getItem("board"));
-        let newID;
         if (!board.notes[board.notes.length-1]){newID = 0;}
         else (newID = board.notes[board.notes.length-1].id+1)
-        board.notes[board.notes.length] = {id: newID,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": klikk.clientX, "y" : klikk.clientY} };
+        createNote(
+            newID,
+            "New Note",
+            "Insert content here",
+            downX, downY
+        );
+        board.notes[board.notes.length-1+1] = {id: newID,"title":"New Note", "content" : "Insert content here", "position" : {"x": downX, "y" : downY} };
         localStorage.setItem("board", JSON.stringify(board));
-        const note = document.createElement("div");
-        note.classList.add("note");
-        note.id = board.notes[board.notes.length-1].id;
-        const dragging = document.createElement("div");
-        dragging.classList.add("noteTop");
-        dragging.id = newID;
-        const title = document.createElement("h1");
-        title.innerText = board.notes[board.notes.length-1].title;
-        title.classList.add("noteTop");
-        title.id = newID;
-        title.contentEditable = true;
-        note.appendChild(title);
-        const content = document.createElement("p");
-        content.innerText = board.notes[board.notes.length-1].content;
-        content.contentEditable = true;
-        note.appendChild(content);
-        const delButton = document.createElement("button");
-        delButton.classList.add("delButton");
-        const delSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        delSVG.setAttribute("width", 22);
-        delSVG.setAttribute("height", 24);
-        delSVG.style.pointerEvents = "none";
-        const delCan = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        delCan.setAttribute("d", "m15.707,11.707l-2.293,2.293,2.293,2.293c.391.391.391,1.023,0,1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-2.293-2.293-2.293,2.293c-.195.195-.451.293-.707.293s-.512-.098-.707-.293c-.391-.391-.391-1.023,0-1.414l2.293-2.293-2.293-2.293c-.391-.391-.391-1.023,0-1.414s1.023-.391,1.414,0l2.293,2.293,2.293-2.293c.391-.391,1.023-.391,1.414,0s.391,1.023,0,1.414Zm7.293-6.707c0,.553-.448,1-1,1h-.885l-1.276,13.472c-.245,2.581-2.385,4.528-4.978,4.528h-5.727c-2.589,0-4.729-1.943-4.977-4.521l-1.296-13.479h-.86c-.552,0-1-.447-1-1s.448-1,1-1h4.101c.465-2.279,2.485-4,4.899-4h2c2.414,0,4.435,1.721,4.899,4h4.101c.552,0,1,.447,1,1Zm-14.828-1h7.656c-.413-1.164-1.524-2-2.828-2h-2c-1.304,0-2.415.836-2.828,2Zm10.934,2H4.87l1.278,13.287c.148,1.547,1.432,2.713,2.986,2.713h5.727c1.556,0,2.84-1.168,2.987-2.718l1.258-13.282Z");
-        delSVG.appendChild(delCan);
-        delButton.appendChild(delSVG);
-        delButton.setAttribute("onclick",`deleteNote(${board.notes[board.notes.length-1]+1})`);
-        note.appendChild(delButton);
-        note.style.transform = `translate(${board.notes[board.notes.length-1].position.x}px, ${board.notes[board.notes.length-1].position.y}px)`;
-        document.body.appendChild(note);
-        localStorage.setItem("board", JSON.stringify(board));
-        setTimeout(event => {
+        setTimeout(() => {
             window.location.reload();
         },1);
-        
     }
 });
 document.addEventListener("mousemove", function(mozg){
@@ -150,13 +176,15 @@ document.addEventListener("mousemove", function(mozg){
             document.getElementById(note.id).style.transform = `translate(${note.position.x}px, ${note.position.y}px)`;
             localStorage.setItem("board", JSON.stringify(board));
         })
-        board.strings.forEach(stringIndex => {
-            const string = document.getElementById(String(stringIndex.id + "s"));
-            string.setAttribute("x1",board.notes[board.strings[stringIndex.id].between[0]].position.x+(document.getElementById(board.strings[stringIndex.id].between[0]).clientWidth/2));
-            string.setAttribute("y1",board.notes[board.strings[stringIndex.id].between[0]].position.y);
-            string.setAttribute("x2",board.notes[board.strings[stringIndex.id].between[1]].position.x+(document.getElementById(board.strings[stringIndex.id].between[1]).clientWidth/2));
-            string.setAttribute("y2",board.notes[board.strings[stringIndex.id].between[1]].position.y);
-        })
+        for(var i = 0; i<board.strings.length;i++){
+            const string = document.getElementById(String(i + "s"));
+            const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
+            const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
+            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
+            string.setAttribute("y1",note1.position.y+20);
+            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
+            string.setAttribute("y2",note2.position.y+20);
+        }
         downX = mozg.clientX;
         downY = mozg.clientY;
     }
@@ -172,14 +200,15 @@ document.addEventListener("mousemove", function(mozg){
             downX = mozg.clientX;
             downY = mozg.clientY;
         })
-        board.strings.forEach(stringIndex => {
-            if(!board.notes[board.strings[stringIndex.id].between[0]] || !board.notes[board.strings[stringIndex.id].between[1]]) {return;}
-            const string = document.getElementById(String(stringIndex.id + "s"));
-            string.setAttribute("x1",board.notes[board.strings[stringIndex.id].between[0]].position.x+(document.getElementById(board.strings[stringIndex.id].between[0]).clientWidth/2));
-            string.setAttribute("y1",board.notes[board.strings[stringIndex.id].between[0]].position.y);
-            string.setAttribute("x2",board.notes[board.strings[stringIndex.id].between[1]].position.x+(document.getElementById(board.strings[stringIndex.id].between[1]).clientWidth/2));
-            string.setAttribute("y2",board.notes[board.strings[stringIndex.id].between[1]].position.y);
-        })
+        for(var i = 0; i<board.strings.length;i++){
+            const string = document.getElementById(String(i + "s"));
+            const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
+            const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
+            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
+            string.setAttribute("y1",note1.position.y+20);
+            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
+            string.setAttribute("y2",note2.position.y+20);
+        }
     }
 })
 document.addEventListener("mouseup", function(klikk){

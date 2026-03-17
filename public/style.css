@@ -21,8 +21,10 @@ div.note {
 .noteTop{
     background-color: rgb(161, 138, 108);
     width: inherit;
-    height: 10px;
+    height: 20px;
     border-radius: 10pt;
+    text-align: center;
+    padding: 2px 0 0 0;
 }
 .delButton svg{
     width: 24px;
@@ -39,4 +41,22 @@ div.note {
 }
 .delButton:hover{
     background-color: rgba(107, 107, 107, 0.267);
+}
+.resButton{
+    position: absolute;
+    left: 90vw;
+    top: 10px;
+}
+.pins{
+    height: 16px;
+    width: 16px;
+    border-radius: 10px;
+    background-color: red;
+    border: none;
+}
+.pins:hover{
+    background-color: rgb(199, 0, 0);
+}
+a{
+    position: absolute;
 }
