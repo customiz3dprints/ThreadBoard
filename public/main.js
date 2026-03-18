@@ -46,7 +46,7 @@ function newString(id){
         let newStringID;
         board = JSON.parse(localStorage.getItem("board"));
         if (!board.strings.length){newStringID = 0;}
-        else (newStringID = board.notes[board.strings.length-1].id+1)
+        else (newStringID = board.strings.length)
         board.strings[board.strings.length] = {"between" : [newStringNote, id]};
         const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
         string.id = String(newStringID + "s");
