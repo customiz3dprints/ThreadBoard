@@ -99,6 +99,18 @@ function createNote(id, NewTitle, NewContent, positionX, positionY,color){
     note.style.transform = `translate(${positionX}px, ${positionY}px)`;
     note.style.backgroundColor = color;
     document.body.appendChild(note);
+    function UpdateString(){
+        for(var i = 0; i<board.strings.length;i++){
+            const string = document.getElementById(String(i + "s"));
+            const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
+            const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
+            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
+            string.setAttribute("y1",note1.position.y+20);
+            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
+            string.setAttribute("y2",note2.position.y+20);
+        }
+    }
+    addEventListener("input", UpdateString);
 }
 
 //custom context menu
@@ -294,7 +306,8 @@ setInterval(function() {
     board = JSON.parse(localStorage.getItem("board"));
     board.notes.forEach(note => {
         note.content = document.getElementById(note.id).querySelector("p").innerHTML;
-        note.title = document.getElementById(note.id).querySelector("h1").innerHTML;
+        newTitle = document.getElementById(note.id).querySelector("h1").innerText;
+        note.title = newTitle ;
     })
     localStorage.setItem("board", JSON.stringify(board));
 }, 2000);
