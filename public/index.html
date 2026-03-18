@@ -8,7 +8,16 @@
     <script src="main.js"></script>
 </head>
 <body id="body" style="user-select: none;">
-    <button class="resButton" onclick="localStorage.clear(); window.location.reload();">Reset board</button>
+    <button class="resButton" onclick="resetBoard(); window.location.reload();">Reset board</button>
     <a href="contact.html">Contact me here</a>
+    <ul id="contextMenu" hidden>
+        <li id="newNote" class="menuElement" onclick="menuNote()">New Note</li>
+        <li id="deleteNote" class="menuElement" onclick="menuDelete()" hidden>Delete Note</li>
+        <li id="deleteString" class="menuElement" onclick="menuDeleteString()" hidden>Delete String</li>
+        <li id="setColor" class="menuElement" onclick="menuColor()" hidden>Set Color</li>
+        <input type="color" name="setColor" id="noteColor" value="#d2b48c" hidden>
+        <li id="close" class="menuElement" onclick="document.getElementById('contextMenu').hidden = true;"> Close menu </li>
+        
+    </ul>
 </body>
 </html>

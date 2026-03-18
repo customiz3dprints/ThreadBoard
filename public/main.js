@@ -4,6 +4,27 @@ let downX;
 let selectedNote;
 let newStringNote;
 const stringObj = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+let menuSelectNote;
+/*
+Basic funcitons, do not touch
+*/
+
+function resetBoard(){
+    localStorage.setItem("board", JSON.stringify(
+            {"notes":[
+                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)" },
+                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)" },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)" },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)" },
+             ],
+             
+            "strings": [
+            ]
+                }
+                
+        ));
+    window.location.reload();
+}
 function deleteNote(id){
     document.getElementById(id).remove();
     board = JSON.parse(localStorage.getItem("board"));
@@ -42,7 +63,7 @@ function newString(id){
         localStorage.setItem("board", JSON.stringify(board));
     }
 }
-function createNote(id, NewTitle, NewContent, positionX, positionY){
+function createNote(id, NewTitle, NewContent, positionX, positionY,color){
     const note = document.createElement("div");
     note.classList.add("note");
     note.id = id;
@@ -76,7 +97,55 @@ function createNote(id, NewTitle, NewContent, positionX, positionY){
     delButton.setAttribute("onclick",`deleteNote(${id})`);
     note.appendChild(delButton);
     note.style.transform = `translate(${positionX}px, ${positionY}px)`;
+    note.style.backgroundColor = color;
     document.body.appendChild(note);
+}
+
+//custom context menu
+function menuNote(){
+    board = JSON.parse(localStorage.getItem("board"));
+    if (!board.notes[board.notes.length-1]){newID = 0;}
+    else (newID = board.notes[board.notes.length-1].id+1)
+    createNote(
+        newID,
+        "New Note",
+        "Insert content here",
+        downX, downY, "rgb(210, 180, 140)"
+    );
+    board.notes[board.notes.length-1+1] = {id: newID,"title":"New Note", "content" : "Insert content here", "position" : {"x": downX, "y" : downY}, "color" : "rgb(210, 180, 140)"};
+    localStorage.setItem("board", JSON.stringify(board));
+    setTimeout(() => {
+        window.location.reload();
+    },1);
+}
+function menuDelete(){
+    deleteNote(Number(menuSelectNote.id));
+}
+function menuColor(){
+    board = JSON.parse(localStorage.getItem("board"));
+    board.notes.find(n => n.id==Number(menuSelectNote.id)).color = document.getElementById("noteColor").value;
+    localStorage.setItem("board", JSON.stringify(board));
+    setTimeout(() => {
+        window.location.reload();
+    },1);
+}
+document.addEventListener("contextmenu", (menu) => {
+    menu.preventDefault();
+})
+function showMenu(posX,posY){
+    const menu = document.getElementById("contextMenu");
+    menu.style.transform = `translate(${posX}px, ${posY}px)`;
+    menu.hidden = false;
+    if (menuSelectNote) {
+        document.getElementById("deleteNote").hidden = false;
+        document.getElementById("setColor").hidden = false;
+        document.getElementById("noteColor").hidden = false;
+    }
+    else{
+        document.getElementById("deleteNote").hidden = true;
+        document.getElementById("setColor").hidden = true;
+        document.getElementById("noteColor").hidden = true;
+    }
 }
 
 window.onload = function () {
@@ -84,10 +153,10 @@ window.onload = function () {
     if (localStorage.length == 0){
         localStorage.setItem("board", JSON.stringify(
             {"notes":[
-                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500} },
-                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800} },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0} },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100} },
+                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)" },
+                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)" },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)" },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)" },
              ],
              
             "strings": [
@@ -104,7 +173,8 @@ window.onload = function () {
             board.notes[i].title,
             board.notes[i].content,
             board.notes[i].position.x,
-            board.notes[i].position.y
+            board.notes[i].position.y,
+            board.notes[i].color
         );
     }
     
@@ -127,45 +197,45 @@ window.onload = function () {
         string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
         string.setAttribute("y2",note2.position.y+20);
         string.setAttribute("style", `stroke:red;stroke-width:8;`);
-        string.classList.add("strings");
+        string.classList.add("string");
         stringObj.appendChild(string);
     }
     
 };
 document.addEventListener("mousedown", function(klikk){
+    downX = klikk.clientX;
+    downY = klikk.clientY;
     if(klikk.button == 1){
-        downX = klikk.clientX;
-        downY = klikk.clientY;
         klikk.preventDefault();
         downMB = true;
     }
     if(klikk.button == 0){
-        downX = klikk.clientX;
-        downY = klikk.clientY;
         downLB = true;
+        
         note = klikk.target.closest(".noteTop");
         if (note){
             selectedNote = note.id
         }
+        menu = klikk.target.closest(".menuElement");
+        if (!menu){
+            if (klikk.target.closest("#noteColor")){return;}
+            document.getElementById("contextMenu").hidden = true;
+            document.getElementById("deleteNote").hidden = true;
+            document.getElementById("setColor").hidden = true;
+            document.getElementById("noteColor").hidden = true;
+        }
     }
     if(klikk.button == 2){
-        downX = klikk.clientX;
-        downY = klikk.clientY;
-        board = JSON.parse(localStorage.getItem("board"));
-        if (!board.notes[board.notes.length-1]){newID = 0;}
-        else (newID = board.notes[board.notes.length-1].id+1)
-        createNote(
-            newID,
-            "New Note",
-            "Insert content here",
-            downX, downY
-        );
-        board.notes[board.notes.length-1+1] = {id: newID,"title":"New Note", "content" : "Insert content here", "position" : {"x": downX, "y" : downY} };
-        localStorage.setItem("board", JSON.stringify(board));
-        setTimeout(() => {
-            window.location.reload();
-        },1);
+        klikk.preventDefault();
+        document.getElementById("contextMenu").hidden = true;
+        document.getElementById("deleteNote").hidden = true;
+        document.getElementById("setColor").hidden = true;
+        document.getElementById("noteColor").hidden = true;
+        console.log(klikk.target.closest(".string"));
+        menuSelectNote = klikk.target.closest(".note");
+        showMenu(klikk.clientX, klikk.clientY);
     }
+    
 });
 document.addEventListener("mousemove", function(mozg){
     board = JSON.parse(localStorage.getItem("board"));

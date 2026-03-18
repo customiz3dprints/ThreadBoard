@@ -1,6 +1,29 @@
 body{
     overflow: hidden;
     margin: 0 0 0 0;
+    font-family: 'Inter', sans-serif;
+    background-image: url("background.jpeg");
+}
+#contextMenu{
+    position: absolute;
+    text-decoration: none;
+    list-style: none;
+    padding: 0 0 0 0;
+    z-index: 3;
+}
+.menuElement{
+    background-color: rgb(200, 200, 200);
+    padding: 5px 90px 5px 10px;
+    text-align: start;
+    border: 1px solid rgb(218, 218, 218);
+    border-radius: 10pt;
+    margin: 5px 5px 5px 5px;
+}
+.menuElement:hover{
+    background-color: rgb(107, 107, 107);;
+}
+#noteColor{
+    margin-left: 10px;
 }
 div.note {
     position: absolute;
@@ -11,7 +34,8 @@ div.note {
     border-width: 3px;
     border-radius: 10px;
     padding: 10px 10px 10px 10px;
-    background-color: tan;
+    background-color: #d2b48c;
+    z-index: 1;
 }
 .drag{
     user-select: none;
@@ -60,3 +84,11 @@ div.note {
 a{
     position: absolute;
 }
+.strings{
+    position: absolute;
+    z-index: 2;
+}
+.stringX{
+    position: absolute;
+}
+
