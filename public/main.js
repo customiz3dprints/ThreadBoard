@@ -63,7 +63,7 @@ function newString(id){
         localStorage.setItem("board", JSON.stringify(board));
     }
 }
-function createNote(id, NewTitle, NewContent, positionX, positionY,color){
+function createNote(id, NewTitle, NewContent, positionX, positionY, color, colorText){
     const note = document.createElement("div");
     note.classList.add("note");
     note.id = id;
@@ -83,6 +83,7 @@ function createNote(id, NewTitle, NewContent, positionX, positionY,color){
     const content = document.createElement("p");
     content.innerHTML = NewContent;
     content.contentEditable = true;
+    content.style.color = colorText;
     note.appendChild(content);
     const delButton = document.createElement("button");
     delButton.classList.add("delButton");
@@ -122,7 +123,7 @@ function menuNote(){
         newID,
         "New Note",
         "Insert content here",
-        downX, downY, "rgb(210, 180, 140)"
+        downX, downY, "rgb(210, 180, 140)", "#000000"
     );
     board.notes[board.notes.length-1+1] = {id: newID,"title":"New Note", "content" : "Insert content here", "position" : {"x": downX, "y" : downY}, "color" : "rgb(210, 180, 140)"};
     localStorage.setItem("board", JSON.stringify(board));
@@ -141,6 +142,14 @@ function menuColor(){
         window.location.reload();
     },1);
 }
+function menuColorText(){
+    board = JSON.parse(localStorage.getItem("board"));
+    board.notes.find(n => n.id==Number(menuSelectNote.id)).colorText = document.getElementById("noteColor").value;
+    localStorage.setItem("board", JSON.stringify(board));
+    setTimeout(() => {
+        window.location.reload();
+    },1);
+}
 document.addEventListener("contextmenu", (menu) => {
     menu.preventDefault();
 })
@@ -151,11 +160,13 @@ function showMenu(posX,posY){
     if (menuSelectNote) {
         document.getElementById("deleteNote").hidden = false;
         document.getElementById("setColor").hidden = false;
+        document.getElementById("setColorText").hidden = false;
         document.getElementById("noteColor").hidden = false;
     }
     else{
         document.getElementById("deleteNote").hidden = true;
         document.getElementById("setColor").hidden = true;
+        document.getElementById("setColorText").hidden = true;
         document.getElementById("noteColor").hidden = true;
     }
 }
@@ -165,10 +176,10 @@ window.onload = function () {
     if (localStorage.length == 0){
         localStorage.setItem("board", JSON.stringify(
             {"notes":[
-                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)" },
-                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)" },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)" },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)" },
+                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
+                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
              ],
              
             "strings": [
@@ -186,7 +197,8 @@ window.onload = function () {
             board.notes[i].content,
             board.notes[i].position.x,
             board.notes[i].position.y,
-            board.notes[i].color
+            board.notes[i].color,
+            board.notes[i].colorText,
         );
     }
     
@@ -205,9 +217,9 @@ window.onload = function () {
         const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
         string.id = String(i + "s");
         string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
-        string.setAttribute("y1",note1.position.y+20);
+        string.setAttribute("y1",note1.position.y+25);
         string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
-        string.setAttribute("y2",note2.position.y+20);
+        string.setAttribute("y2",note2.position.y+25);
         string.setAttribute("style", `stroke:red;stroke-width:8;`);
         string.classList.add("string");
         stringObj.appendChild(string);
@@ -263,9 +275,9 @@ document.addEventListener("mousemove", function(mozg){
             const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
             const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
             string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
-            string.setAttribute("y1",note1.position.y+20);
+            string.setAttribute("y1",note1.position.y+25);
             string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
-            string.setAttribute("y2",note2.position.y+20);
+            string.setAttribute("y2",note2.position.y+25);
         }
         downX = mozg.clientX;
         downY = mozg.clientY;
@@ -287,9 +299,9 @@ document.addEventListener("mousemove", function(mozg){
             const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
             const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
             string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
-            string.setAttribute("y1",note1.position.y+20);
+            string.setAttribute("y1",note1.position.y+25);
             string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
-            string.setAttribute("y2",note2.position.y+20);
+            string.setAttribute("y2",note2.position.y+25);
         }
     }
 })
