@@ -75,7 +75,7 @@ function newString(id){
         string.id = String("tempString");
         string.setAttribute("x1",note1.position.x+(document.getElementById(newStringNote).clientWidth/2)+3);
         string.setAttribute("y1",note1.position.y+25);
-        string.setAttribute("x2",note1.position.x+(document.getElementById(newStringNote).clientWidth/2)+3);
+        string.setAttribute("x2",note1.position.x+(document.getElementById(newStringNote).clientWidth/2));
         string.setAttribute("y2",note1.position.y+25);
         string.setAttribute("style", `stroke:#b10000;stroke-width:8;`);
         string.classList.add("strings");
@@ -400,8 +400,8 @@ document.addEventListener("mousemove", function(mozg){
     }
     const tempString = document.getElementById("tempString");
     if(tempString){
-        tempString.setAttribute("x2", mozg.clientX);
-        tempString.setAttribute("y2", mozg.clientY);
+        tempString.setAttribute("x2", mozg.clientX+20);
+        tempString.setAttribute("y2", mozg.clientY+10);
     }
     
 })
@@ -421,7 +421,7 @@ setInterval(function() {
     board.notes.forEach(note => {
         note.content = document.getElementById(note.id).querySelector("p").innerHTML;
         newTitle = document.getElementById(note.id).querySelector("h1").innerText;
-        note.title = newTitle ;
+        note.title = newTitle;
     })
     board.name = document.getElementById("boardTitle").innerText;
     localStorage.setItem("board", JSON.stringify(board));
