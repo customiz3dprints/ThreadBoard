@@ -9,6 +9,6 @@ a{
 hr{
     width: 50%;
 }
-a:hover{
+a:hover{        
     text-decoration: underline;
 }

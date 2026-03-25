@@ -2,21 +2,48 @@ let downMB, downLB;
 let downY;
 let downX;
 let selectedNote;
+let resizingNote;
 let newStringNote;
 const stringObj = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 let menuSelectNote;
+let startSizeX, startSizeY;
 /*
 Basic funcitons, do not touch
 */
 
+function exportBoard(){
+    const board = localStorage.getItem("board");
+    const exportFile = new Blob([board], {type : "application/json"});
+    const url = window.URL.createObjectURL(exportFile);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = JSON.parse(board).name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+}
+function UpdateString(){
+        for(var i = 0; i<board.strings.length;i++){
+            const string = document.getElementById(String(i + "s"));
+            const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
+            const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
+            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2)+3);
+            string.setAttribute("y1",note1.position.y+25);
+            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
+            string.setAttribute("y2",note2.position.y+25);
+        }
+    }
 function resetBoard(){
     localStorage.setItem("board", JSON.stringify(
-            {"notes":[
-                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)" },
-                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)" },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)" },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)" },
-             ],
+            {
+                "name": "New Board",
+                "notes":[
+                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
+                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                ],
              
             "strings": [
             ]
@@ -37,33 +64,47 @@ function deleteNote(id){
     localStorage.setItem("board", JSON.stringify(board));
     window.location.reload();
 }
+
+//creating stuff
+
 function newString(id){
     if (newStringNote == null) {
-        
         newStringNote = id;
+        const note1 = board.notes.find(n => n.id==newStringNote);
+        const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        string.id = String("tempString");
+        string.setAttribute("x1",note1.position.x+(document.getElementById(newStringNote).clientWidth/2)+3);
+        string.setAttribute("y1",note1.position.y+25);
+        string.setAttribute("x2",note1.position.x+(document.getElementById(newStringNote).clientWidth/2)+3);
+        string.setAttribute("y2",note1.position.y+25);
+        string.setAttribute("style", `stroke:#b10000;stroke-width:8;`);
+        string.classList.add("strings");
+        stringObj.appendChild(string);
     }
     else{
         let newStringID;
+        document.getElementById("tempString").remove();
         board = JSON.parse(localStorage.getItem("board"));
         if (!board.strings.length){newStringID = 0;}
-        else (newStringID = board.strings.length)
+        else {newStringID = board.strings.length}
+        const note1 = board.notes.find(n => n.id==newStringNote);
+        const note2 = board.notes.find(n => n.id==id);
+        if(note1.id === note2.id){return;}
         board.strings[board.strings.length] = {"between" : [newStringNote, id]};
         const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
         string.id = String(newStringID + "s");
-        const note1 = board.notes.find(n => n.id==newStringNote);
-        const note2 = board.notes.find(n => n.id==id);
-        string.setAttribute("x1",note1.position.x+(document.getElementById(newStringNote).clientWidth/2));
-        string.setAttribute("y1",note1.position.y+20);
-        string.setAttribute("x2",note2.position.x+(document.getElementById(id).clientWidth/2));
-        string.setAttribute("y2",note2.position.y+20);
-        string.setAttribute("style", `stroke:red;stroke-width:8;`);
+        string.setAttribute("x1",note1.position.x+(document.getElementById(newStringNote).clientWidth/2)+3);
+        string.setAttribute("y1",note1.position.y+25);
+        string.setAttribute("x2",note2.position.x+(document.getElementById(id).clientWidth/2)+3);
+        string.setAttribute("y2",note2.position.y+25);
+        string.setAttribute("style", `stroke:#b10000;stroke-width:8;`);
         string.classList.add("strings");
         stringObj.appendChild(string);
         newStringNote = null;
         localStorage.setItem("board", JSON.stringify(board));
     }
 }
-function createNote(id, NewTitle, NewContent, positionX, positionY, color, colorText){
+function createNote(id, NewTitle, NewContent, positionX, positionY, width, height, color, colorText){
     const note = document.createElement("div");
     note.classList.add("note");
     note.id = id;
@@ -97,24 +138,37 @@ function createNote(id, NewTitle, NewContent, positionX, positionY, color, color
     delButton.appendChild(delSVG);
     delButton.setAttribute("onclick",`deleteNote(${id})`);
     note.appendChild(delButton);
+
+    //resizing notes
+
+    const resizeSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    resizeSVG.classList.add("resize");
+    resizeSVG.setAttribute("width", 24);
+    resizeSVG.setAttribute("height", 24);
+    const resizeButton1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    resizeButton1.setAttribute("d", "M10.707,13.293c-.391-.391-1.023-.391-1.414,0l-6.175,6.175c-.187-1.134-.239-2.858,.434-4.968,.167-.526-.123-1.089-.649-1.256-.529-.167-1.089,.123-1.257,.649-1.463,4.594,.009,7.782,.072,7.916,.099,.208,.267,.376,.475,.475,.09,.042,1.551,.717,3.888,.717,1.149,0,2.512-.164,4.027-.646,.526-.167,.816-.73,.649-1.256-.168-.526-.727-.817-1.257-.649-2.112,.672-3.835,.62-4.968,.434l6.175-6.175c.391-.391,.391-1.023,0-1.414Z");
+    const resizeButton2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    resizeButton2.setAttribute("d", "M13.293,10.707c.391,.391,1.023,.391,1.414,0l6.175-6.175c.187,1.134,.239,2.858-.434,4.968-.167,.526,.123,1.089,.649,1.256,.529,.167,1.089-.123,1.257-.649,1.463-4.594-.009-7.782-.072-7.916-.099-.208-.267-.376-.475-.475-.09-.042-1.551-.717-3.888-.717-1.149,0-2.512,.164-4.027,.646-.526,.167-.816,.73-.649,1.256,.168,.526,.727,.817,1.257,.649,2.112-.672,3.835-.62,4.968-.434l-6.175,6.175c-.391,.391-.391,1.023,0,1.414Z");
+    resizeSVG.appendChild(resizeButton1);
+    resizeSVG.appendChild(resizeButton2);
+    const resizeDiv = document.createElement("div");
+    resizeDiv.style.width = 24;
+    resizeDiv.style.height = 24;
+    resizeDiv.appendChild(resizeSVG);
+    resizeDiv.classList.add("rDiv");
+    note.appendChild(resizeDiv);
     note.style.transform = `translate(${positionX}px, ${positionY}px)`;
+    note.style.width = width + "px";
+    note.style.height = height + "px";
     note.style.backgroundColor = color;
+    
     document.body.appendChild(note);
-    function UpdateString(){
-        for(var i = 0; i<board.strings.length;i++){
-            const string = document.getElementById(String(i + "s"));
-            const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
-            const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
-            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
-            string.setAttribute("y1",note1.position.y+20);
-            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
-            string.setAttribute("y2",note2.position.y+20);
-        }
-    }
+    
     addEventListener("input", UpdateString);
 }
 
 //custom context menu
+
 function menuNote(){
     board = JSON.parse(localStorage.getItem("board"));
     if (!board.notes[board.notes.length-1]){newID = 0;}
@@ -123,9 +177,9 @@ function menuNote(){
         newID,
         "New Note",
         "Insert content here",
-        downX, downY, "rgb(210, 180, 140)", "#000000"
+        downX, downY, 200, 160, "rgb(210, 180, 140)", "#000000"
     );
-    board.notes[board.notes.length-1+1] = {id: newID,"title":"New Note", "content" : "Insert content here", "position" : {"x": downX, "y" : downY}, "color" : "rgb(210, 180, 140)"};
+    board.notes[board.notes.length-1+1] = {id: newID,"title":"New Note", "content" : "Insert content here", "position" : {"x": downX, "y" : downY}, "width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"};
     localStorage.setItem("board", JSON.stringify(board));
     setTimeout(() => {
         window.location.reload();
@@ -169,27 +223,54 @@ function showMenu(posX,posY){
         document.getElementById("setColorText").hidden = true;
         document.getElementById("noteColor").hidden = true;
     }
+    menu.style.maxHeight=0;
+    menu.style.maxHeight=null;
 }
 
 window.onload = function () {
+    
+    const importJSON = document.getElementById("importJSON");
+    importJSON.addEventListener("change", function(change){
+        const file = change.target.files[0];
+        if(!file){return;}
+        const reader = new FileReader();
+        reader.onload = function(){
+            try {
+                const data = JSON.parse(reader.result);
+                if (!data.strings || !data.notes){
+                    window.alert("Improper JSON file");
+                    return;
+                }
+                localStorage.setItem("board", JSON.stringify(data));
+                window.location.reload();
+            } catch(error){
+                window.alert("Error: " + error);
+            }
+        };
+        reader.readAsText(file);
+    });
     console.log(JSON.parse(localStorage.getItem("board")));
     if (localStorage.length == 0){
         localStorage.setItem("board", JSON.stringify(
-            {"notes":[
+            {
+                "name": "New Board",
+                "notes":[
                     {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
                     {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
                     {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
                     {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100}, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-             ],
+                ],
              
             "strings": [
             ]
                 }
                 
-        ))
+        ));
     }
     
     board = JSON.parse(localStorage.getItem("board"));
+    const boardTitle = document.getElementById("boardTitle");
+    boardTitle.innerText = board.name;
     for(var i = 0; i < (board.notes).length; i++){
         createNote(
             board.notes[i].id,
@@ -197,6 +278,8 @@ window.onload = function () {
             board.notes[i].content,
             board.notes[i].position.x,
             board.notes[i].position.y,
+            board.notes[i].width,
+            board.notes[i].height,
             board.notes[i].color,
             board.notes[i].colorText,
         );
@@ -216,11 +299,11 @@ window.onload = function () {
         if(!note1 || !note2) {continue;}
         const string = document.createElementNS("http://www.w3.org/2000/svg", "line");
         string.id = String(i + "s");
-        string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
+        string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2)+3);
         string.setAttribute("y1",note1.position.y+25);
-        string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
+        string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
         string.setAttribute("y2",note2.position.y+25);
-        string.setAttribute("style", `stroke:red;stroke-width:8;`);
+        string.setAttribute("style", `stroke:#b10000;stroke-width:8;`);
         string.classList.add("string");
         stringObj.appendChild(string);
     }
@@ -235,7 +318,12 @@ document.addEventListener("mousedown", function(klikk){
     }
     if(klikk.button == 0){
         downLB = true;
-        
+        const resizeDiv = klikk.target.closest(".rDiv");
+        if (resizeDiv) {
+            resizingNote = resizeDiv.parentNode;
+            startSizeX = resizingNote.offsetWidth;
+            startSizeY = resizingNote.offsetHeight;
+        }   
         note = klikk.target.closest(".noteTop");
         if (note){
             selectedNote = note.id
@@ -255,7 +343,6 @@ document.addEventListener("mousedown", function(klikk){
         document.getElementById("deleteNote").hidden = true;
         document.getElementById("setColor").hidden = true;
         document.getElementById("noteColor").hidden = true;
-        console.log(klikk.target.closest(".string"));
         menuSelectNote = klikk.target.closest(".note");
         showMenu(klikk.clientX, klikk.clientY);
     }
@@ -274,36 +361,49 @@ document.addEventListener("mousemove", function(mozg){
             const string = document.getElementById(String(i + "s"));
             const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
             const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
-            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
+            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2)+3);
             string.setAttribute("y1",note1.position.y+25);
-            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
+            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
             string.setAttribute("y2",note2.position.y+25);
         }
         downX = mozg.clientX;
         downY = mozg.clientY;
     }
     if(downLB){
-        if(!selectedNote){return;}
-        board = JSON.parse(localStorage.getItem("board"));
-        board.notes.forEach(note => {
-            if(note.id != selectedNote){return;}
-            note.position.x += mozg.clientX-downX; 
-            note.position.y += mozg.clientY-downY; 
-            this.getElementById(note.id).style.transform = `translate(${note.position.x}px, ${note.position.y}px)`;
-            localStorage.setItem("board", JSON.stringify(board));
-            downX = mozg.clientX;
-            downY = mozg.clientY;
-        })
-        for(var i = 0; i<board.strings.length;i++){
-            const string = document.getElementById(String(i + "s"));
-            const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
-            const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
-            string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2));
-            string.setAttribute("y1",note1.position.y+25);
-            string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2));
-            string.setAttribute("y2",note2.position.y+25);
+        if(!selectedNote){
+            if(!resizingNote){return;}
+            resizingNote.style.width = Math.max(200, Number(startSizeX + ((mozg.clientX-downX)-20))) + "px"; 
+            resizingNote.style.height = Math.max(160,Number(startSizeY + ((mozg.clientY-downY)-20)))+ "px";
+            UpdateString();
+        }
+        else{
+            board = JSON.parse(localStorage.getItem("board"));
+            board.notes.forEach(note => {
+                if(note.id != selectedNote){return;}
+                note.position.x += mozg.clientX-downX; 
+                note.position.y += mozg.clientY-downY; 
+                this.getElementById(note.id).style.transform = `translate(${note.position.x}px, ${note.position.y}px)`;
+                localStorage.setItem("board", JSON.stringify(board));
+                downX = mozg.clientX;
+                downY = mozg.clientY;
+            })
+            for(var i = 0; i<board.strings.length;i++){
+                const string = document.getElementById(String(i + "s"));
+                const note1 = board.notes.find(n => n.id==board.strings[i].between[0]);
+                const note2 = board.notes.find(n => n.id==board.strings[i].between[1]);
+                string.setAttribute("x1",note1.position.x+(document.getElementById(board.strings[i].between[0]).clientWidth/2)+3);
+                string.setAttribute("y1",note1.position.y+25);
+                string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
+                string.setAttribute("y2",note2.position.y+25);
+            }
         }
     }
+    const tempString = document.getElementById("tempString");
+    if(tempString){
+        tempString.setAttribute("x2", mozg.clientX);
+        tempString.setAttribute("y2", mozg.clientY);
+    }
+    
 })
 document.addEventListener("mouseup", function(klikk){
     if(klikk.button == 1){
@@ -312,6 +412,8 @@ document.addEventListener("mouseup", function(klikk){
     if(klikk.button == 0){
         downLB = false;
         selectedNote = null;
+        board = JSON.parse(localStorage.getItem("board"));
+        resizingNote = null;
     }
 });
 setInterval(function() {
@@ -321,5 +423,6 @@ setInterval(function() {
         newTitle = document.getElementById(note.id).querySelector("h1").innerText;
         note.title = newTitle ;
     })
+    board.name = document.getElementById("boardTitle").innerText;
     localStorage.setItem("board", JSON.stringify(board));
 }, 2000);

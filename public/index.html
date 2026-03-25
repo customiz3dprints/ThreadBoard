@@ -8,8 +8,24 @@
     <script src="main.js"></script>
 </head>
 <body id="body" style="user-select: none;">
-    <button class="resButton" onclick="resetBoard(); window.location.reload();">Reset board</button>
-    <a href="contact.html">Contact me here</a>
+    <header id="header">
+        <div id="infodiv">
+            <span>Thread Board</span>
+            <span><a href="contact.html" class="nodecorLink">Contact</a></span>
+        </div>
+        <br>
+        <div id="controlDiv">
+            <span>Title:</span> <span id="boardTitle" contenteditable="true">New Board</span>
+                <div id="buttonDiv">
+                    <button class="Button" onclick="resetBoard(); window.location.reload();">Reset board</button>
+                    <button class="Button" onclick="exportBoard()">Export board as JSON</button>
+                    Import board from JSON:<input id="importJSON" type="file" accept="application/json" class="Button">
+                </div>
+        </div>
+        
+    </header>
+    
+    
     <ul id="contextMenu" hidden>
         <li id="newNote" class="menuElement" onclick="menuNote()">New Note</li>
         <li id="deleteNote" class="menuElement" onclick="menuDelete()" hidden>Delete Note</li>
