@@ -10,7 +10,14 @@ let startSizeX, startSizeY;
 /*
 Basic funcitons, do not touch
 */
-
+function deleteString(id){
+    board = JSON.parse(localStorage.getItem("board"));
+    const string = document.getElementById(String(id+"s"));
+    string.remove();
+    board.strings.splice(id, 1);
+    localStorage.setItem("board", JSON.stringify(board));
+    window.location.reload();
+}
 function exportBoard(){
     const board = localStorage.getItem("board");
     const exportFile = new Blob([board], {type : "application/json"});
@@ -32,6 +39,10 @@ function UpdateString(){
             string.setAttribute("y1",note1.position.y+25);
             string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
             string.setAttribute("y2",note2.position.y+25);
+            let ButtonPosX = Math.min(string.getAttribute("x1"), string.getAttribute("x2"))+((Math.max(string.getAttribute("x1"), string.getAttribute("x2")) - Math.min(string.getAttribute("x1"), string.getAttribute("x2")))/2);
+            let ButtonPosY = Math.min(string.getAttribute("y1"), string.getAttribute("y2"))+((Math.max(string.getAttribute("y1"), string.getAttribute("y2")) - Math.min(string.getAttribute("y1"), string.getAttribute("y2")))/2);
+            const delStringButton = document.getElementById(String(i + "sd"));
+            delStringButton.style.transform = `translate(${ButtonPosX-5}px, ${ButtonPosY-5}px)`;
         }
     }
 function resetBoard(){
@@ -41,8 +52,8 @@ function resetBoard(){
                 "notes":[
                     {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
                     {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 300, "y" : 300},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
                 ],
              
             "strings": [
@@ -100,6 +111,15 @@ function newString(id){
         string.setAttribute("style", `stroke:#b10000;stroke-width:8;`);
         string.classList.add("strings");
         stringObj.appendChild(string);
+        const delStringButton = document.createElement("button");
+        let ButtonPosX = Math.min(string.getAttribute("x1"), string.getAttribute("x2"))+((Math.max(string.getAttribute("x1"), string.getAttribute("x2")) - Math.min(string.getAttribute("x1"), string.getAttribute("x2")))/2);
+        let ButtonPosY = Math.min(string.getAttribute("y1"), string.getAttribute("y2"))+((Math.max(string.getAttribute("y1"), string.getAttribute("y2")) - Math.min(string.getAttribute("y1"), string.getAttribute("y2")))/2);
+        delStringButton.style.transform = `translate(${ButtonPosX-5}px, ${ButtonPosY-5}px)`;
+        delStringButton.classList.add("stringDel");
+        delStringButton.id = String(string.id + "d");
+        delStringButton.setAttribute("onclick", `deleteString(${newStringID})`);
+        delStringButton.innerHTML= "X";
+        document.body.appendChild(delStringButton);
         newStringNote = null;
         localStorage.setItem("board", JSON.stringify(board));
     }
@@ -257,8 +277,8 @@ window.onload = function () {
                 "notes":[
                     {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
                     {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
                 ],
              
             "strings": [
@@ -305,6 +325,15 @@ window.onload = function () {
         string.setAttribute("y2",note2.position.y+25);
         string.setAttribute("style", `stroke:#b10000;stroke-width:8;`);
         string.classList.add("string");
+        const delStringButton = document.createElement("button");
+        let ButtonPosX = Math.min(string.getAttribute("x1"), string.getAttribute("x2"))+((Math.max(string.getAttribute("x1"), string.getAttribute("x2")) - Math.min(string.getAttribute("x1"), string.getAttribute("x2")))/2);
+        let ButtonPosY = Math.min(string.getAttribute("y1"), string.getAttribute("y2"))+((Math.max(string.getAttribute("y1"), string.getAttribute("y2")) - Math.min(string.getAttribute("y1"), string.getAttribute("y2")))/2);
+        delStringButton.style.transform = `translate(${ButtonPosX-5}px, ${ButtonPosY-5}px)`;
+        delStringButton.classList.add("stringDel");
+        delStringButton.id = String(string.id + "d");
+        delStringButton.setAttribute("onclick", `deleteString(${i})`);
+        delStringButton.innerHTML= "X";
+        document.body.appendChild(delStringButton);
         stringObj.appendChild(string);
     }
     
@@ -365,6 +394,10 @@ document.addEventListener("mousemove", function(mozg){
             string.setAttribute("y1",note1.position.y+25);
             string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
             string.setAttribute("y2",note2.position.y+25);
+            let ButtonPosX = Math.min(string.getAttribute("x1"), string.getAttribute("x2"))+((Math.max(string.getAttribute("x1"), string.getAttribute("x2")) - Math.min(string.getAttribute("x1"), string.getAttribute("x2")))/2);
+            let ButtonPosY = Math.min(string.getAttribute("y1"), string.getAttribute("y2"))+((Math.max(string.getAttribute("y1"), string.getAttribute("y2")) - Math.min(string.getAttribute("y1"), string.getAttribute("y2")))/2);
+            const delStringButton = document.getElementById(String(i + "sd"));
+            delStringButton.style.transform = `translate(${ButtonPosX-5}px, ${ButtonPosY-5}px)`;
         }
         downX = mozg.clientX;
         downY = mozg.clientY;
@@ -395,6 +428,10 @@ document.addEventListener("mousemove", function(mozg){
                 string.setAttribute("y1",note1.position.y+25);
                 string.setAttribute("x2",note2.position.x+(document.getElementById(board.strings[i].between[1]).clientWidth/2)+3);
                 string.setAttribute("y2",note2.position.y+25);
+                let ButtonPosX = Math.min(string.getAttribute("x1"), string.getAttribute("x2"))+((Math.max(string.getAttribute("x1"), string.getAttribute("x2")) - Math.min(string.getAttribute("x1"), string.getAttribute("x2")))/2);
+                let ButtonPosY = Math.min(string.getAttribute("y1"), string.getAttribute("y2"))+((Math.max(string.getAttribute("y1"), string.getAttribute("y2")) - Math.min(string.getAttribute("y1"), string.getAttribute("y2")))/2);
+                const delStringButton = document.getElementById(String(i + "sd"));
+                delStringButton.style.transform = `translate(${ButtonPosX-5}px, ${ButtonPosY-5}px)`;
             }
         }
     }
@@ -422,8 +459,8 @@ setInterval(function() {
         note.content = document.getElementById(note.id).querySelector("p").innerHTML;
         newTitle = document.getElementById(note.id).querySelector("h1").innerText;
         note.title = newTitle;
-        note.width = document.getElementById(note.id).clientWidth;
-        note.height = document.getElementById(note.id).clientHeight;
+        note.width = document.getElementById(note.id).style.width;
+        note.height = document.getElementById(note.id).style.height;
     })
     board.name = document.getElementById("boardTitle").innerText;
     localStorage.setItem("board", JSON.stringify(board));

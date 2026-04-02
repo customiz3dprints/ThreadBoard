@@ -145,3 +145,14 @@ span{
 #controlDiv{
     padding: 0px 10px 0px 10px;
 }
+.stringDel{
+    position: absolute;
+    z-index: 3;
+    background: none;
+    border: none;
+    font-weight: bold;
+    border-radius: 10pt;
+}
+.stringDel:hover{
+    background-color: rgba(128, 128, 128, 0.555);
+}
