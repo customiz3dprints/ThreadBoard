@@ -179,7 +179,7 @@ function createNote(id, NewTitle, NewContent, positionX, positionY, width, heigh
     note.appendChild(resizeDiv);
     note.style.transform = `translate(${positionX}px, ${positionY}px)`;
     note.style.width = width + "px";
-    note.style.height = height + "px";
+    note.style.height = height+"px";
     note.style.backgroundColor = color;
     
     document.body.appendChild(note);
@@ -407,6 +407,13 @@ document.addEventListener("mousemove", function(mozg){
             if(!resizingNote){return;}
             resizingNote.style.width = Math.max(200, Number(startSizeX + ((mozg.clientX-downX)-20))) + "px"; 
             resizingNote.style.height = Math.max(160,Number(startSizeY + ((mozg.clientY-downY)-20)))+ "px";
+            board = JSON.parse(localStorage.getItem("board"));
+            board.notes.forEach(note => {
+                if(note.id != resizingNote.id){return;}
+                note.width = Math.max(200, Number(startSizeX + ((mozg.clientX-downX)-20)));
+                note.height = Math.max(160,Number(startSizeY + ((mozg.clientY-downY)-20)));
+            });
+            localStorage.setItem("board", JSON.stringify(board));
             UpdateString();
         }
         else{
@@ -459,9 +466,9 @@ setInterval(function() {
         note.content = document.getElementById(note.id).querySelector("p").innerHTML;
         newTitle = document.getElementById(note.id).querySelector("h1").innerText;
         note.title = newTitle;
-        note.width = document.getElementById(note.id).style.width;
-        note.height = document.getElementById(note.id).style.height;
-    })
+        note.width = parseFloat(document.getElementById(note.id).style.width);
+        note.height = parseFloat(document.getElementById(note.id).style.height);
+    });
     board.name = document.getElementById("boardTitle").innerText;
     localStorage.setItem("board", JSON.stringify(board));
 }, 2000);
