@@ -11,8 +11,8 @@ Access it [here](https://threadboard-town.web.app). No login required. Or hell, 
 - Make notes wherever your heart desires.
 - Connect them with strings to link ideas and with solutions, or even sub-ideas
 - Unlimited canvas
-- Import your boards, or export to share with friends or co-workers (WIP)
-- Styling your notes (done) and strings (WIP)
+- Import your boards, or export to share with friends or co-workers (with JSON files)
+- Styling your notes and strings
 
 ## Usage
 - drag notes with the dark part with LMB
