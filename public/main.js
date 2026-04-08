@@ -52,8 +52,8 @@ function resetBoard(){
                 "notes":[
                     {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500}, "width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
                     {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800}, "width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 300, "y" : 300},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 300, "y" : 300},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
                 ],
              
             "strings": [
@@ -275,10 +275,10 @@ window.onload = function () {
             {
                 "name": "New Board",
                 "notes":[
-                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
-                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
-                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"  },
+                    {id: 0, "title":"drag me 1", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 500, "y" : 500},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"},
+                    {id: 1,"title":"drag me 2", "content" : "drag me with LMB, drag all with MMB", "position" : {"x": 800, "y" : 800},"width" : 200, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"},
+                    {id: 2, "title":"Connect me 1", "content" : "click the red button on top, and the button of another note", "position" : {"x": 0, "y" : 0},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000" },
+                    {id: 3,"title":"Connect me 2", "content" : "click the red button on top, and the button of another note", "position" : {"x": 100, "y" : 100},"width" : 400, "height" : 160, "color" : "rgb(210, 180, 140)", "textColor" : "#000000"},
                 ],
              
             "strings": [
